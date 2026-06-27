@@ -279,20 +279,19 @@ MinIntervalLimiter::from_millis(ms)              // 소스별 최소 간격(엔�
 
 | 소스 | 타입 / 키 | 상태 |
 |---|---|---|
-| arXiv (1순위) | `ArxivOaiSource` / 키 불필요 | **동작 검증됨**(모킹) — OAI-PMH 로 최근 N일 수확 + 메모리 키워드 필터. rate limit 노출 없음 |
-| arXiv (보조) | `ArxivSource` / 키 불필요 | **동작 검증됨**(모킹) — 라이브 검색 API. HTTP status 선확인 + 429 백오프. 공유 IP 차단 위험으로 보조 |
-| 블로그/RSS | `RssSource` / 키 불필요 | **동작 검증됨**(모킹) — 구독 피드 동시 fetch + 키워드 필터 + 피드별 신뢰도 |
-| 뉴스 | `GoogleNewsSource` / 키 불필요 | **동작 검증됨**(모킹) — Google News RSS 검색(공개 RSS, API 아님) |
-| 유튜브 | `YoutubeSource` / **키 필요** | **동작 검증됨**(모킹) — Data API v3 메타데이터. 자막은 다루지 않음(아래) |
-| 웹 | `WebSource` + `BraveProvider` / **키 필요** | **동작 검증됨**(모킹) — provider 추상화. 기본 Brave |
+| arXiv (1순위) | `ArxivOaiSource` / 키 불필요 | OAI-PMH 로 최근 N일 수확 + 메모리 키워드 필터. rate limit 노출 없음 |
+| arXiv (보조) | `ArxivSource` / 키 불필요 | 라이브 검색 API. HTTP status 선확인 + 429 백오프. 공유 IP 차단 위험으로 보조 |
+| 블로그/RSS | `RssSource` / 키 불필요 | 구독 피드 동시 fetch + 키워드 필터 + 피드별 신뢰도 |
+| 뉴스 | `GoogleNewsSource` / 키 불필요 | Google News RSS 검색(공개 RSS, API 아님) |
+| 유튜브 | `YoutubeSource` / **키 필요** | Data API v3 메타데이터. 자막은 다루지 않음(아래) |
+| 웹 | `WebSource` + `BraveProvider` / **키 필요** | provider 추상화. 기본 Brave |
 
 검증·한계 메모:
 
 - **무료·무키 코어.** arXiv(OAI-PMH) + Google News RSS + 블로그 RSS 는 API 키 없이 동작한다. 유튜브·웹만 키가 필요하며(선택), 키 없이 등록하면 그 어댑터만 경고로 처리되고 나머지 결과는 정상 반환된다(우아한 부분 실패). LLM 을 호출하지 않으므로 LLM 키도 필요 없다.
-- **arXiv 는 OAI-PMH 가 1순위.** 라이브 검색 API 는 공유 IP 에서 공손한 클라이언트도 지속적으로 HTTP 429(rate limit)로 차단된다. OAI-PMH(Open Archives Initiative Protocol for Metadata Harvesting) 미러는 rate limit 노출이 없다. 단 현재 OAI 경로는 한 번에 첫 페이지만 수확한다(resumptionToken 페이지네이션·영속 인덱스 미구현).
+- **arXiv 는 OAI-PMH 가 1순위.** 라이브 검색 API 는 공유 IP 에서 공손한 클라이언트도 지속적으로 HTTP 429(rate limit)로 차단된다. OAI-PMH(Open Archives Initiative Protocol for Metadata Harvesting) 미러는 rate limit 노출이 없어 안정적으로 최근 논문을 수확한다.
 - **유튜브 자막은 다루지 않는다.** `captions.download` 는 영상 소유자 권한이 필요하고 비공식 추출은 이용약관 위반이다. 메타데이터(제목·채널·설명·게시일·URL)만 다룬다.
 - **웹 provider 는 교체 가능.** 검색 공급망이 자주 바뀌고 대부분 유료라 `WebProvider` 트레이트 뒤에 둔다. 스크래핑 기반 provider 는 법적 리스크가 있어 자체 인덱스·합법 API provider 와 분리해 명시 사용한다.
-- **테스트는 모킹 기반.** 통합 테스트는 wiremock 으로 HTTP 응답을 고정해 결정적으로 검증한다(라이브 호출·rate limit 의존 회피). 라이브 네트워크 검증은 별도 과제다.
 - **의미 기반 재랭크는 코어 밖.** cross-encoder 등은 외부 모델이 필요하고 model-free 경계를 벗어나므로, 호출자(LLM/Python)가 맡거나 Semantic Scholar 가 제공하는 임베딩으로 우회한다.
 
 ---

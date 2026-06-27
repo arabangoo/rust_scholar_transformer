@@ -26,8 +26,9 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist
-          sccache: "true"
+          # zig 로 크로스 컴파일 — reqwest(rustls)가 끌어오는 ring 의 ARM 어셈블리를
+          # aarch64 manylinux 에서 빌드하려면 zig 가 필요하다(기본 gcc 크로스는 __ARM_ARCH 미정의로 실패).
+          args: --release --out dist --zig
           manylinux: auto
       - uses: actions/upload-artifact@v4
         with:
