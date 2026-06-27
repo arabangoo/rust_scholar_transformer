@@ -1,0 +1,44 @@
+[package]
+name         = "rust_scholar_transformer"
+version      = "0.1.0"
+edition      = "2021"
+license      = "Apache-2.0"
+description  = "Real-time multi-source retrieval core engine (Rust) — concurrent fetch, normalize, dedup (incl. near-dup), RRF fusion, cache, rate limit. Pure-Rust, zero-FFI default, PyO3-ready."
+repository   = "https://github.com/arabangoo/rust_scholar_transformer"
+readme       = "README.md"
+keywords     = ["retrieval", "rag", "arxiv", "search", "async"]
+categories   = ["asynchronous", "web-programming"]
+
+[lib]
+name       = "rust_scholar_transformer"
+# rlib: 일반 사용/CLI/테스트, cdylib: PyO3 확장 모듈(python feature)
+crate-type = ["rlib", "cdylib"]
+
+[features]
+default     = []
+# L2 디스크 캐시(순수 Rust redb). L1 인메모리(moka)는 기본 포함.
+cache-disk  = ["dep:redb"]
+# Python 바인딩(PyO3 cdylib). abi3 휠.
+python      = ["dep:pyo3"]
+
+[dependencies]
+tokio       = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }
+reqwest     = { version = "0.12", default-features = false, features = ["rustls-tls", "charset"] }
+futures     = "0.3"
+async-trait = "0.1"
+quick-xml   = { version = "0.37", features = ["serialize"] }
+feed-rs     = "2"
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+chrono      = { version = "0.4", features = ["serde"] }
+url         = "2"
+thiserror   = "2"
+moka        = { version = "0.12", features = ["future"] }
+
+# 선택 의존성
+redb        = { version = "2", optional = true }
+pyo3        = { version = "0.24", optional = true, features = ["extension-module", "abi3-py39"] }
+
+[dev-dependencies]
+tokio    = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }
+wiremock = "0.6"

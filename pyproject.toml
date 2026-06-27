@@ -1,0 +1,14 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "rust_scholar_transformer"
+description = "Real-time multi-source retrieval core engine (Rust) with a Python binding."
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+dynamic = ["version"]
+
+[tool.maturin]
+# python feature 를 켜야 PyO3 모듈이 빌드된다.
+features = ["python"]
