@@ -1,6 +1,6 @@
 [package]
 name         = "rust_scholar_transformer"
-version      = "0.1.1"
+version      = "0.1.2"
 edition      = "2021"
 license      = "Apache-2.0"
 description  = "Real-time multi-source retrieval core engine (Rust) — concurrent fetch, normalize, dedup (incl. near-dup), RRF fusion, cache, rate limit. Pure-Rust, zero-FFI default, PyO3-ready."
